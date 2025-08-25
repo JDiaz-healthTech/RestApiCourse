@@ -72,5 +72,10 @@ namespace Movies.Application.Repositories
         {
             throw new NotImplementedException();
         }
+
+        Task IMovieRepository.CreateAsync(Func<Movie> movie)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

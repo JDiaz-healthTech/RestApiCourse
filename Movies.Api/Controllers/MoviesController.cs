@@ -1,6 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Movies.Api.Mapping;
+using Movies.Application.Models;
 using Movies.Application.Repositories;
 using Movies.Contracts.Requests;
+using System.Reflection;
 
 namespace Movies.Api.Controllers;
 
@@ -15,10 +18,55 @@ public class MoviesController : ControllerBase
 
     }
 
-    [HttpPost("movies")]
+    [HttpPost(ApiEndPoints.Movies.Create)]
     public async Task<IActionResult> Create([FromBody] CreateMovieRequest request)
     {
-        return Ok(request);
+        var movie = request.MapToMovie();
+        await _movieRepository.CreateAsync(movie);
+        return CreatedAtAction(nameof(Get), new { id = movie.Id }, movie);
+        //return Created($"/{ApiEndPoints.Movies.Create}{movie.Id}", movie);
     }
+
+    [HttpGet(ApiEndPoints.Movies.Get)]
+    public async Task<IActionResult> Get([FromRoute] Guid id)
+    {
+        var movie = await _movieRepository.GetByIdAsync(id);
+        if (movie is null)
+
+        {
+            return NotFound();
+
+        }
+
+        var response = movie.MapToResponse();
+
+        return Ok(response);
+
+    }
+
+    [HttpGet(ApiEndPoints.Movies.GetAll)]
+    public async Task<IActionResult> GetAll()
+    {
+        var movies = await _movieRepository.GetAllAsync();
+        var movieResponse = movies.MapToResponse();
+        return Ok(movieResponse);
+    }
+
+
+    [HttpPut(ApiEndPoints.Movies.Update)]
+    public async Task<IActionResult> Update([FromRoute]Guid id,
+        [FromBody]UpdateMovieRequest request)
+    {
+        var movie = request.MapToMovie(id);
+        var updated = await _movieRepository.UpdateAsync(movie);
+        if (!updated)
+        {
+            return NotFound();
+        }
+        var response = movie.MapToResponse(); 
+        return Ok(response);
+    }
+    
+
 }
 
