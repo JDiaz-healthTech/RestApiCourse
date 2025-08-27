@@ -1,4 +1,5 @@
 ﻿using Movies.Application.Models;
+using Movies.Contracts.Requests;
 
 namespace Movies.Application.Repositories
 {
@@ -13,6 +14,7 @@ namespace Movies.Application.Repositories
         Task<bool> UpdateAsync(Movie movie);
 
         Task<bool> DeleteByIdAsync(Guid id);
-        Task CreateAsync(Func<Movie> movie);
+        Task<bool> PatchByIdAsync(Guid id, MoviePartialUpdateRequest patch);
+      
     }
 }
